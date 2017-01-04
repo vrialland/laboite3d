@@ -28,6 +28,7 @@
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
  */
+
 import * as THREE from 'three';
 
 THREE.STLLoader = function ( manager ) {

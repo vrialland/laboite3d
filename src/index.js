@@ -5,7 +5,9 @@ import './STLLoader';
 var renderer,
 	scene,
 	camera,
-	controls;
+	controls,
+	light,
+	laboite;
 
 function deg2rad(degrees) {
 	return degrees * Math.PI / 180;
@@ -23,7 +25,7 @@ function init() {
 
 	// Camera
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-	camera.position.z = 5;
+	camera.position.set(0, 0, 25);
 
 	// Controls
 	controls = new THREE.TrackballControls(camera);
@@ -32,40 +34,43 @@ function init() {
 	var geometry, material;
 
 	// Add ambient light
-	var ambient = new THREE.AmbientLight({ color: 0xffffff });
-	scene.add(ambient);
+	light = new THREE.PointLight(0xffffff, 1, 1000);
+	light.position.set(0, 30, 50);
+	scene.add(light);
 
 	// Add Laboite
-	var laboite = new THREE.Object3D();
-
+	laboite = new THREE.Object3D();
 	var loader = new THREE.STLLoader();
 	loader.load('./models/laboite_front_v42.stl', (geometry) => {
-		material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+		geometry.scale(-0.2, 0.2, -0.2);
+		geometry.computeBoundingBox();
+		material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
 		let front = new THREE.Mesh(geometry, material)
-		front.rotation.y = deg2rad(90);
+		front.translateZ(geometry.boundingBox.getSize().z);
+		var center = geometry.boundingBox.getCenter();
+		front.position.set(-center.x, -center.y, -center.z)
 		laboite.add(front);
 	});
 	loader.load('./models/laboite_back_v42.stl', (geometry) => {
-		material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
-		let back = new THREE.Mesh(geometry)
-		back.rotation.y = deg2rad(-90);
-		let bbox = new THREE.Box3().setFromObject(back); 
-		back.position.x += bbox.max.x - bbox.min.x;
+		geometry.scale(0.2, 0.2, 0.2);
+		geometry.computeBoundingBox();
+		material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+		let back = new THREE.Mesh(geometry, material)
+		var center = geometry.boundingBox.getCenter();
+		back.position.set(-center.x, -center.y, -center.z)
 		laboite.add(back);
 	});
-
 	scene.add(laboite);
+	laboite.rotateY(deg2rad(-90));
 
 	// Add ground
 	/*geometry = new THREE.PlaneGeometry(100, 100);
-	material = new THREE.MeshBasicMaterial({color: 0x0000ff,
-											side: THREE.DoubleSide});
+	material = new THREE.MeshPhongMaterial({color: 0x0000ff,
+						side: THREE.DoubleSide});
 	var floor = new THREE.Mesh(geometry, material);
 	floor.rotateX(deg2rad(90));
 	floor.position.set(0, -1, 0);
 	scene.add(floor);*/
-
-	camera.lookAt(laboite);
 
 	window.addEventListener('resize', onWindowResize, false);
 	render();
@@ -82,6 +87,7 @@ function onWindowResize() {
 function animate() {
 	requestAnimationFrame(animate);
 	controls.update();
+	render();
 }
 
 function render() {
@@ -90,3 +96,14 @@ function render() {
 
 init();
 animate();
+
+// TODO: Remove this
+window.laboite = {
+	THREE: THREE,
+	renderer: renderer,
+	scene: scene,
+	camera: camera,
+	controls: controls,
+	light: light,
+	laboite: laboite
+};
