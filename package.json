@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --port=5000"
+    "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --port=5000",
+    "build": "./node_modules/webpack/bin/webpack.js -p"
   },
   "author": {
     "name": "Vincent Rialland",
