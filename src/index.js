@@ -6,12 +6,16 @@ import deg2rad from './utils';
 import Boite from './boite';
 
 
+const COLS = 16,
+	  ROWS = 2;
+
+
 var renderer,
 	scene,
 	camera,
 	controls,
 	light,
-	led,
+	leds = [],
 	laboite;
 
 
@@ -46,8 +50,14 @@ function init() {
 	laboite = new Boite();
 	scene.add(laboite);
 
-	led = new Led();
-	scene.add(led);
+	for (let i=0; i < COLS; i++) {
+		for (let j=0; j < ROWS; j++) {
+			let led = new Led();
+			led.position.set(0, -5 + j * 0.8, -20 + i * 0.8);
+			leds.push(led);
+			laboite.add(led);
+		}
+	}
 
 	window.addEventListener('resize', onWindowResize, false);
 	render();
@@ -63,8 +73,14 @@ function onWindowResize() {
 }
 
 
-function animate() {
+function animate(t) {
 	requestAnimationFrame(animate);
+	for (let i = 0; i < COLS * ROWS; i++) {
+		var r = Math.floor(Math.random() * 255),
+			g =	Math.floor(Math.random() * 255),
+			b =	Math.floor(Math.random() * 255);
+		leds[i].setColorRGB(r, g, b);
+	}
 	controls.update();
 	render();
 }
@@ -86,6 +102,6 @@ window.laboite = {
 	camera: camera,
 	controls: controls,
 	light: light,
-	led: led,
+	leds: leds,
 	laboite: laboite
 };

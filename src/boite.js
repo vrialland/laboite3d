@@ -22,8 +22,7 @@ export default class Boite extends THREE.Object3D {
 			material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
 			self.front = new THREE.Mesh(geometry, material);
 			self.front.translateZ(geometry.boundingBox.getSize().z);
-			var center = geometry.boundingBox.getCenter();
-			self.front.position.set(-center.x, -center.y, -center.z + this.OFFSET);
+			self.front.position.set(0, 0, this.OFFSET);
 			self.add(self.front);
 		});
 
@@ -32,8 +31,8 @@ export default class Boite extends THREE.Object3D {
 			geometry.computeBoundingBox();
 			material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
 			self.back = new THREE.Mesh(geometry, material);
-			var center = geometry.boundingBox.getCenter();
-			self.back.position.set(-center.x, -center.y, -center.z - this.OFFSET);
+			var size = geometry.boundingBox.getSize();
+			self.back.position.set(0, 0, -size.z - this.OFFSET);
 			self.add(self.back);
 		});
 
