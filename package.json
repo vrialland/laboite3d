@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --port=5000",
     "build": "./node_modules/webpack/bin/webpack.js --progress --colors -p",
-    "deploy": "npm run build && cp -R models index.html bundle.js build/ && gh-pages --dist build/"
+    "deploy": "npm run build && cp -R assets index.html bundle.js build/ && gh-pages --dist build/"
   },
   "author": {
     "name": "Vincent Rialland",

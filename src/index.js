@@ -1,66 +1,9 @@
 import * as THREE from 'three';
 import './TrackballControls';
 import './STLLoader';
-
-function deg2rad(degrees) {
-	return degrees * Math.PI / 180;
-}
-
-
-class Boite {
-	constructor() {
-		this.OFFSET = 0.3;
-		this.obj = new THREE.Object3D();
-		this.front = null;
-		this.back = null;
-		this.loadParts();
-	}
-
-	getObject3D() {
-		return this.obj;
-	}
-
-	loadParts() {
-		var loader = new THREE.STLLoader(),
-			self = this,
-			material;
-
-		loader.load('./models/laboite_front_v42.stl', (geometry) => {
-			geometry.scale(-0.2, 0.2, -0.2);
-			geometry.computeBoundingBox();
-			material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
-			self.front = new THREE.Mesh(geometry, material)
-			self.front.translateZ(geometry.boundingBox.getSize().z);
-			var center = geometry.boundingBox.getCenter();
-			self.front.position.set(-center.x, -center.y, -center.z + this.OFFSET);
-			self.obj.add(self.front);
-		});
-
-		loader.load('./models/laboite_back_v42.stl', (geometry) => {
-			geometry.scale(0.2, 0.2, 0.2);
-			geometry.computeBoundingBox();
-			material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-			self.back = new THREE.Mesh(geometry, material)
-			var center = geometry.boundingBox.getCenter();
-			self.back.position.set(-center.x, -center.y, -center.z - this.OFFSET);
-			self.obj.add(self.back);
-		});
-
-		this.obj.rotateY(deg2rad(-90))
-	}
-
-	_setColor(part, r, g, b) {
-		part.material.color.setRGB(r, g, b);
-	}
-
-	setBackColor(r, g, b) {
-		this._setColor(this.back, r, g, b);
-	}   
-
-	setFrontColor(r, g, b) {
-		this._setColor(this.front, r, g, b);
-	}
-}
+import Led from './led';
+import deg2rad from './utils';
+import Boite from './boite';
 
 
 var renderer,
@@ -68,12 +11,13 @@ var renderer,
 	camera,
 	controls,
 	light,
+	led,
 	laboite;
 
 
 function init() {
 	// Renderer
-	renderer = new THREE.WebGLRenderer();
+	renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
@@ -91,22 +35,19 @@ function init() {
 	var geometry, material;
 
 	// Add ambient light
+
+	light = new THREE.AmbientLight(0xffffff, 0.3);
+	scene.add(light);
 	light = new THREE.PointLight(0xffffff, 1, 1000);
 	light.position.set(0, 30, 50);
 	scene.add(light);
 
 	// Add Laboite
 	laboite = new Boite();
-	scene.add(laboite.getObject3D());
+	scene.add(laboite);
 
-	// Add ground
-	/*geometry = new THREE.PlaneGeometry(100, 100);
-	material = new THREE.MeshPhongMaterial({color: 0x0000ff,
-						side: THREE.DoubleSide});
-	var floor = new THREE.Mesh(geometry, material);
-	floor.rotateX(deg2rad(90));
-	floor.position.set(0, -1, 0);
-	scene.add(floor);*/
+	led = new Led();
+	scene.add(led);
 
 	window.addEventListener('resize', onWindowResize, false);
 	render();
@@ -145,5 +86,6 @@ window.laboite = {
 	camera: camera,
 	controls: controls,
 	light: light,
+	led: led,
 	laboite: laboite
 };
